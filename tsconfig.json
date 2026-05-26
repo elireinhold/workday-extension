@@ -10,10 +10,9 @@
   ],
   "compilerOptions": {
     "paths": {
-      "~*": [
-        "./*"
-      ]
+      "data-text:*": ["node_modules/plasmo/src/type-declarations/global.d.ts"]
     },
-    "baseUrl": "."
+    "baseUrl": ".",
+    "types": ["chrome"]
   }
 }

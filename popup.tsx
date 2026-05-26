@@ -1,26 +1,12 @@
-import { useState } from "react"
+import React from "react"
 
-function IndexPopup() {
-  const [data, setData] = useState("")
-
+export default function Popup() {
   return (
-    <div
-      style={{
-        padding: 16
-      }}>
-      <h2>
-        Welcome to your{" "}
-        <a href="https://www.plasmo.com" target="_blank">
-          Plasmo
-        </a>{" "}
-        Extension!
-      </h2>
-      <input onChange={(e) => setData(e.target.value)} value={data} />
-      <a href="https://docs.plasmo.com" target="_blank">
-        View Docs
-      </a>
+    <div style={{ width: 300, padding: 16, fontFamily: "sans-serif" }}>
+      <h2 style={{ margin: 0 }}>Stevens Scheduler</h2>
+      <p style={{ color: "#888", fontSize: 13 }}>
+        Open Workday to use the scheduler sidebar.
+      </p>
     </div>
   )
 }
-
-export default IndexPopup
