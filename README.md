@@ -1,33 +1,27 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# Workday Scheduler Extension
 
-## Getting Started
+A Chrome extension that enhances the Stevens Institute of Technology Workday portal with a modern scheduling interface.
 
-First, run the development server:
+## Features
 
-```bash
-pnpm dev
-# or
-npm run dev
-```
+- **Course Search** — Search Workday courses directly from a sidebar without navigating the default UI
+- **Conflict Detection** — Automatically detects time overlaps between sections you add to your schedule
+- **Section Comparison** — View instructor, time, room, seats, and status side by side
+- **Schedule Management** — Add and remove sections to build and compare possible schedules
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+## How It Works
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+The extension injects a sidebar into the Workday course search page. It intercepts Workday's native XHR requests to capture the session-specific search endpoint, then uses it to power a faster, cleaner search interface built on top of the existing Workday session.
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
+## Stack
 
-## Making production build
+- TypeScript
+- React
+- Plasmo
 
-Run the following:
+## Usage
 
-```bash
-pnpm build
-# or
-npm run build
-```
-
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
-
-## Submit to the webstores
-
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+1. Install the extension in Chrome
+2. Navigate to the Stevens Workday course search page
+3. Do one search in the Workday UI to initialize the session
+4. Click the **Scheduler** tab on the right edge of the page
