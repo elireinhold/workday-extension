@@ -1,6 +1,7 @@
 import type { PlasmoCSConfig } from "plasmo"
-import { searchCourses, getSearchCache, primeCacheFromDOM } from "../lib/workdayApi"
-primeCacheFromDOM()
+import { searchCourses, getSearchCache, primeCacheFromAnyRequest } from "../lib/workdayApi"
+
+primeCacheFromAnyRequest()
 
 export const config: PlasmoCSConfig = {
   matches: ["https://wd5.myworkday.com/stevens/*"],

@@ -5,12 +5,20 @@
   --surface: #13131a;
   --surface2: #1c1c26;
   --border: #2a2a3a;
-  --accent: #c8102e;
-  --accent-dim: rgba(200, 16, 46, 0.15);
+  
+  /* ── Brand colors (Swapped to Blue) ── */
+  --accent: #4f46e5;                 /* Main indigo-blue accent */
+  --accent-dim: rgba(79, 70, 229, 0.1); /* Translucent accent background */
+  
   --text: #f0f0f5;
   --text-muted: #888899;
+  
+  /* ── Status Colors ── */
   --green: #22c55e;
   --yellow: #eab308;
+  --red-conflict: #ef4444;           /* Strict, reserved red for conflicts */
+  --red-conflict-dim: rgba(239, 68, 68, 0.1);
+  
   --mono: 'DM Mono', monospace;
   --sans: 'Syne', sans-serif;
 
@@ -50,7 +58,7 @@
 .ss-logo-mark {
   width: 28px;
   height: 28px;
-  background: var(--accent);
+  background: var(--accent); /* Now blue */
   border-radius: 6px;
   display: flex;
   align-items: center;
@@ -120,15 +128,16 @@
 .ss-tab:hover { color: var(--text); }
 
 .ss-tab.active {
-  color: var(--accent);
+  color: var(--accent); /* Active tab line is blue */
   border-bottom-color: var(--accent);
 }
 
-/* ── Search panel ── */
-.ss-search-panel {
+/* ── Panels Layout ── */
+.ss-search-panel, 
+.ss-schedule-panel {
   display: flex;
   flex-direction: column;
-  flex: 1;
+  height: calc(100vh - 110px);
   overflow: hidden;
 }
 
@@ -153,11 +162,11 @@
   transition: border-color 0.15s;
 }
 
-.ss-input:focus { border-color: var(--accent); }
+.ss-input:focus { border-color: var(--accent); } /* Focus outline blue */
 .ss-input::placeholder { color: var(--text-muted); }
 
 .ss-search-btn {
-  background: var(--accent);
+  background: var(--accent); /* Blue search button */
   border: none;
   border-radius: 6px;
   color: white;
@@ -173,25 +182,34 @@
 .ss-search-btn:hover { opacity: 0.85; }
 .ss-search-btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-/* ── Results ── */
-.ss-results {
+/* ── Scrolling Contexts (Unified) ── */
+.ss-scrollable-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
   flex: 1;
   overflow-y: auto;
   padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
 }
 
-.ss-results::-webkit-scrollbar { width: 4px; }
-.ss-results::-webkit-scrollbar-track { background: transparent; }
-.ss-results::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+.ss-scrollable-container::-webkit-scrollbar { width: 4px; }
+.ss-scrollable-container::-webkit-scrollbar-track { background: transparent; }
+.ss-scrollable-container::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-.ss-empty {
+.ss-results, 
+.ss-added-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Centering Rules for Empty States */
+.ss-empty,
+.ss-schedule-empty {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  height: 100%;
   flex: 1;
   color: var(--text-muted);
   font-size: 13px;
@@ -201,6 +219,7 @@
 }
 
 .ss-empty-icon { font-size: 32px; opacity: 0.4; }
+.ss-empty-sub { font-size: 11px; color: var(--text-muted); }
 
 .ss-loading {
   display: flex;
@@ -225,15 +244,26 @@
 
 /* ── Course card ── */
 .ss-card {
+  flex-shrink: 0;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 8px;
-  overflow: hidden;
-  transition: border-color 0.15s;
+  min-height: 120px;
+  height: auto;        
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: border-color 0.15s, background-color 0.15s;
 }
 
 .ss-card:hover { border-color: #3a3a4a; }
-.ss-card.added { border-color: var(--accent); background: var(--accent-dim); }
+.ss-card.added { border-color: var(--accent); background: var(--accent-dim); } /* Added turns blue */
+
+/* Schedule Tab Specific Card Tweaks */
+.ss-card.ss-schedule-card {
+  border-left: 3px solid var(--accent); /* Clean blue bar for safe classes */
+  margin-bottom: 0;
+}
 
 .ss-card-header {
   padding: 10px 12px;
@@ -248,7 +278,7 @@
 .ss-section-code {
   font-family: var(--mono);
   font-size: 11px;
-  color: var(--accent);
+  color: var(--accent); /* Codes styled blue */
   font-weight: 500;
   margin-bottom: 2px;
 }
@@ -280,11 +310,28 @@
 .ss-add-btn:hover { border-color: var(--accent); color: var(--accent); }
 .ss-add-btn.added { background: var(--accent); border-color: var(--accent); color: white; }
 
+/* Remove button style override inside Schedule tab */
+.ss-add-btn.ss-remove-action-btn {
+  background: transparent;
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+}
+
+.ss-add-btn.ss-remove-action-btn:hover {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--red-conflict);
+  border-color: var(--red-conflict);
+}
+
 .ss-card-meta {
   padding: 0 12px 10px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 4px 8px;
+}
+
+.ss-meta-span-all {
+  grid-column: 1 / -1;
 }
 
 .ss-meta-item {
@@ -309,35 +356,14 @@
 }
 
 .ss-badge.open { background: rgba(34,197,94,0.15); color: var(--green); }
-.ss-badge.closed { background: rgba(239,68,68,0.15); color: #ef4444; }
+.ss-badge.closed { background: rgba(239,68,68,0.15); color: var(--red-conflict); }
 .ss-badge.waitlist { background: rgba(234,179,8,0.15); color: var(--yellow); }
 
-/* ── Schedule panel ── */
-.ss-schedule-panel {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  overflow: hidden;
-}
-
-.ss-schedule-empty {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: var(--text-muted);
-  font-size: 13px;
-  gap: 8px;
-  text-align: center;
-  padding: 40px 20px;
-}
-
-/* ── Conflicts ── */
+/* ── Schedule Conflicts (RESERVED RED) ── */
 .ss-conflicts {
   margin: 12px;
-  background: rgba(200,16,46,0.1);
-  border: 1px solid rgba(200,16,46,0.3);
+  background: var(--red-conflict-dim);
+  border: 1px solid rgba(239, 68, 68, 0.3);
   border-radius: 8px;
   padding: 10px 12px;
 }
@@ -345,7 +371,7 @@
 .ss-conflicts-title {
   font-size: 11px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--red-conflict);
   letter-spacing: 0.08em;
   text-transform: uppercase;
   margin-bottom: 6px;
@@ -356,67 +382,26 @@
   font-family: var(--mono);
   color: #f87171;
   padding: 3px 0;
-  border-top: 1px solid rgba(200,16,46,0.2);
+  border-top: 1px solid rgba(239, 68, 68, 0.2);
 }
 
 .ss-conflict-item:first-of-type { border-top: none; }
 
-/* ── Added sections list ── */
-.ss-added-list {
-  flex: 1;
-  overflow-y: auto;
-  padding: 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.ss-added-list::-webkit-scrollbar { width: 4px; }
-.ss-added-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
-
-.ss-added-card {
-  background: var(--surface);
-  border: 1px solid var(--border);
+/* Red container border for sections that trigger active conflicts */
+.ss-schedule-conflict-border {
+  border: 1px solid var(--red-conflict);
   border-radius: 8px;
-  padding: 10px 12px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
+  background: rgba(239, 68, 68, 0.12) !important; /* Noticeable translucent red background shade */
+  padding: 4px;
 }
 
-.ss-added-card.conflict { border-color: rgba(200,16,46,0.5); }
-
-.ss-added-info { flex: 1; min-width: 0; }
-
-.ss-added-code {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--accent);
-  margin-bottom: 2px;
+.ss-schedule-conflict-border .ss-card.ss-schedule-card {
+  border-left-color: var(--red-conflict) !important; 
+  background: transparent; /* Lets the parent red shade bleed through cleanly */
+  border-top: none;
+  border-right: none;
+  border-bottom: none;
 }
-
-.ss-added-time {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: var(--text-muted);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ss-remove-btn {
-  background: none;
-  border: 1px solid var(--border);
-  border-radius: 4px;
-  color: var(--text-muted);
-  font-size: 12px;
-  padding: 3px 8px;
-  cursor: pointer;
-  transition: all 0.15s;
-}
-
-.ss-remove-btn:hover { border-color: var(--accent); color: var(--accent); }
 
 .ss-clear-btn {
   margin: 0 12px 12px;
@@ -435,16 +420,16 @@
   flex-shrink: 0;
 }
 
-.ss-clear-btn:hover { border-color: var(--accent); color: var(--accent); }
+.ss-clear-btn:hover { border-color: var(--red-conflict); color: var(--red-conflict); }
 
 /* ── Toggle button (outside sidebar) ── */
 #stevens-scheduler-toggle {
   position: fixed;
   top: 50%;
-  right: 0;
+  right: 0;                    /* Default when sidebar is closed */
   transform: translateY(-50%);
-  z-index: 999998;
-  background: var(--accent, #c8102e);
+  z-index: 10000000;           /* Sit on top of everything */
+  background: #4f46e5;         /* Hardcoded Indigo Blue so it is never transparent */
   border: none;
   border-radius: 8px 0 0 8px;
   color: white;
@@ -458,7 +443,285 @@
   writing-mode: vertical-rl;
   text-orientation: mixed;
   box-shadow: -2px 0 12px rgba(0,0,0,0.3);
-  transition: opacity 0.15s;
+  transition: right 0.2s ease, opacity 0.15s; /* Smooth transition when sidebar slides open */
 }
 
 #stevens-scheduler-toggle:hover { opacity: 0.85; }
+
+/* Auto-shift the toggle leftward when the scheduler is visible */
+#stevens-scheduler-root:not([style*="display: none"]) ~ #stevens-scheduler-toggle,
+#stevens-scheduler-root.ss-open ~ #stevens-scheduler-toggle {
+  right: 420px; /* Slides over to sit perfectly on the sidebar's left border */
+}
+
+/* ── Calendar Tab & Grid View ── */
+.ss-calendar-tab-panel {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.ss-calendar-scroll-wrapper {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: auto;
+}
+
+.ss-calendar-grid {
+  display: flex;
+  min-width: 360px;
+  position: relative;
+  padding-right: 8px; 
+}
+
+/* Time label column */
+.ss-calendar-time-col {
+  width: 38px;
+  flex-shrink: 0;
+  position: relative;
+  height: 672px; 
+}
+
+.ss-calendar-time-label {
+  position: absolute;
+  right: 6px;
+  font-size: 9px;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  white-space: nowrap;
+}
+
+/* Days container & columns */
+.ss-calendar-days-container {
+  display: flex;
+  flex: 1;
+  border-left: 1px solid var(--border);
+}
+
+.ss-calendar-day-col {
+  flex: 1;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border); 
+  min-width: 0; 
+}
+
+.ss-calendar-day-header {
+  text-align: center;
+  font-size: 10px;
+  font-weight: 700;
+  font-family: var(--sans);
+  color: var(--text-muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  padding: 6px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.ss-calendar-events-track {
+  position: relative;
+  height: 672px; 
+  width: 100%;
+}
+
+/* Hour gridlines */
+.ss-calendar-hour-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  border-top: 1px solid var(--border);
+  opacity: 0.4;
+  pointer-events: none; 
+}
+
+/* Event Blocks */
+.ss-calendar-event-block {
+  position: absolute;
+  box-sizing: border-box; 
+  border-radius: 4px;
+  padding: 4px 6px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  overflow: hidden;
+  transition: width 0.15s ease, left 0.15s ease, opacity 0.15s;
+}
+
+.ss-calendar-event-block:hover {
+  z-index: 10 !important; 
+  filter: brightness(1.1);
+}
+
+/* Red shaded styling for calendar conflict blocks */
+.ss-calendar-event-block.ss-conflict {
+  background: rgba(239, 68, 68, 0.25) !important; /* Distinct red background shade */
+  border: 1px solid var(--red-conflict) !important;
+  border-left: 4px solid var(--red-conflict) !important; /* Thick alert stripe */
+}
+
+.ss-calendar-event-block.ss-conflict .ss-calendar-event-code {
+  color: #ff9494 !important; /* Brightened for high accessibility text contrast */
+}
+
+.ss-calendar-event-block.ss-conflict .ss-calendar-event-time {
+  color: #ffbaba !important;
+}
+
+.ss-calendar-event-code {
+  font-size: 9px;
+  font-weight: 700;
+  font-family: var(--mono);
+  line-height: 1.2;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ss-calendar-event-time {
+  font-size: 8px;
+  opacity: 0.8;
+  font-family: var(--mono);
+  margin-top: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* ── Calendar Hover Tooltip ── */
+.ss-calendar-tooltip {
+  pointer-events: none; 
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.4);
+  border-radius: 6px;
+  padding: 10px;
+  max-width: 260px;
+  font-family: var(--sans);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ss-tooltip-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.ss-tooltip-code {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--accent); /* Blue header tooltip */
+  font-weight: 500;
+}
+
+.ss-tooltip-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.3;
+}
+
+.ss-tooltip-details {
+  border-top: 1px solid var(--border);
+  margin-top: 6px;
+  padding-top: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.ss-tooltip-detail {
+  font-size: 10px;
+  color: var(--text-muted);
+  font-family: var(--mono);
+  white-space: pre-wrap;
+}
+
+/* ── Calendar Controls & Delete Mode (RESERVED RED) ── */
+.ss-calendar-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  margin-bottom: 12px;
+}
+
+.ss-delete-toggle-btn {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  color: var(--text-muted);
+  border-radius: 6px;
+  padding: 8px 12px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.15s ease-in-out;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.ss-delete-toggle-btn:hover {
+  border-color: var(--red-conflict);
+  color: var(--red-conflict);
+}
+
+.ss-delete-toggle-btn.active {
+  background: var(--red-conflict);
+  border-color: var(--red-conflict);
+  color: white;
+}
+
+.ss-calendar-instructions {
+  font-size: 10px;
+  color: var(--text-muted);
+  text-align: center;
+  line-height: 1.3;
+}
+
+.ss-calendar-event-block.ss-can-delete {
+  cursor: pointer !important;
+}
+
+.ss-calendar-event-block.ss-can-delete:hover {
+  background: rgba(239, 68, 68, 0.25) !important;
+  border-left-color: var(--red-conflict) !important;
+  box-shadow: inset 0 0 0 1px var(--red-conflict);
+}
+
+.ss-delete-overlay-x {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+.ss-calendar-event-block.ss-can-delete:hover .ss-delete-overlay-x {
+  opacity: 1;
+  transform: translate(-50%, -50%) scale(1.2);
+  transition: transform 0.15s ease;
+}
+
+/* Hide scrollbar for WebKit browsers (Chrome, Safari, Edge, Opera) */
+.ss-calendar-scroll-wrapper::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox and IE/Edge */
+.ss-calendar-scroll-wrapper {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+  overflow-y: auto;       /* Still allows scrolling */
+}

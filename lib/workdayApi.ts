@@ -135,6 +135,27 @@ export function primeCacheFromDOM(): void {
   observer.observe(document.body, { childList: true, subtree: true })
 }
 
+export function primeCacheFromAnyRequest(): void {
+  if (cachedSearchUrl) return
+
+  const originalOpen = XMLHttpRequest.prototype.open
+  const probe = new XMLHttpRequest()
+  
+  // Watch for any faceted-search2 URL in any XHR to derive the search URL
+  XMLHttpRequest.prototype.open = function(method: string, url: string, ...rest: any[]) {
+    if (!cachedSearchUrl && url.includes("faceted-search2")) {
+      // Derive the search URL from any faceted-search2 request
+      const match = url.match(/(https:\/\/wd5\.myworkday\.com\/[^/]+\/faceted-search2\/c\d+\/fs\d+)/)
+      if (match) {
+        const searchUrl = `${match[1]}/search.htmld`
+        cachedSearchUrl = searchUrl
+        resolveEndpoint(searchUrl)
+      }
+    }
+    return originalOpen.apply(this, [method, url, ...rest])
+  }
+}
+
 const originalOpen = XMLHttpRequest.prototype.open
 const originalSend = XMLHttpRequest.prototype.send
 
