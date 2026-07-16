@@ -103,7 +103,7 @@ function CourseCard({
               style={{
                 marginLeft: "8px",
                 fontSize: "11px",
-                color: "#666666", // Stevens Red
+                color: "#c8102e", // Stevens Red
                 textDecoration: "underline",
                 cursor: "pointer"
               }}
