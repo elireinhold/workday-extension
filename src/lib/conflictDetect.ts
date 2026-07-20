@@ -1,3 +1,5 @@
+// Detects conflicts between classes in saved schedule
+
 import type { CourseSection } from "./types"
 import { parseRoomAndTime } from "./parseTime"
 

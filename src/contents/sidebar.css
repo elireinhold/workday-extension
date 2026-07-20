@@ -725,3 +725,10 @@
   scrollbar-width: none;  /* Firefox */
   overflow-y: auto;       /* Still allows scrolling */
 }
+
+.ss-help-image {
+  margin-top: 12px;
+  max-width: 100%;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}

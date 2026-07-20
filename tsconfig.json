@@ -9,10 +9,11 @@
     "./**/*.tsx"
   ],
   "compilerOptions": {
-    "paths": {
-      "data-text:*": ["node_modules/plasmo/src/type-declarations/global.d.ts"]
-    },
     "baseUrl": ".",
+    "paths": {
+      "data-text:*": ["node_modules/plasmo/src/type-declarations/global.d.ts"],
+      "~*": ["src/*"]
+    },
     "types": ["chrome"]
   }
 }
