@@ -417,12 +417,46 @@ export function Sidebar({ onClose }: { onClose: () => void }) {
   const [query, setQuery] = useState("")
   const [results, setResults] = useState<CourseSection[]>([])
   const [loading, setLoading] = useState(false)
+  const [cacheReady, setCacheReady] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [added, setAdded] = useState<CourseSection[]>([])
+  const [isInitialLoad, setIsInitialLoad] = useState(true) // Prevents overwriting storage on mount
   const inputRef = useRef<HTMLInputElement>(null)
 
   const conflicts = detectConflicts(added)
   const conflictSections = new Set(conflicts.flatMap((c) => [c.sectionA, c.sectionB]))
+
+  // Polls for the cache
+  useEffect(() => {
+  if (cacheReady) return
+    const interval = setInterval(() => {
+      window.postMessage({ type: "GET_CACHE_STATUS" }, "*")
+    }, 500)
+    return () => clearInterval(interval)
+  }, [cacheReady])
+
+  // 1. LOAD schedule from chrome.storage on mount
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("quack-saved-schedule")
+      if (saved) {
+        setAdded(JSON.parse(saved))
+      }
+    } catch (e) {
+      console.error("Error loading schedule:", e)
+    }
+    setIsInitialLoad(false)
+  }, [])
+
+  // 2. SAVE schedule to chrome.storage whenever 'added' state changes
+  useEffect(() => {
+    if (isInitialLoad) return
+    try {
+      localStorage.setItem("quack-saved-schedule", JSON.stringify(added))
+    } catch (e) {
+      console.error("Error saving schedule:", e)
+    }
+  }, [added, isInitialLoad])
 
   useEffect(() => {
     const handler = (event: MessageEvent) => {
@@ -435,6 +469,9 @@ export function Sidebar({ onClose }: { onClose: () => void }) {
       if (event.data?.type === "SEARCH_ERROR") {
         setError(event.data.error)
         setLoading(false)
+      }
+      if (event.data?.type === "CACHE_STATUS" && event.data.url) {
+        setCacheReady(true)
       }
     }
     window.addEventListener("message", handler)
@@ -494,7 +531,7 @@ export function Sidebar({ onClose }: { onClose: () => void }) {
       {/* Search tab */}
       {tab === "search" && (
         <div className="ss-search-panel">
-          <div className="ss-search-bar">
+          <div className="ss-search-bar" style={{ display: !cacheReady ? "none" : "flex" }}>
             <input
               ref={inputRef}
               className="ss-input"
@@ -519,14 +556,14 @@ export function Sidebar({ onClose }: { onClose: () => void }) {
                 Searching Workday...
               </div>
             )}
-            {error && (
+            {!cacheReady && (
               <div className="ss-empty">
-                <div className="ss-empty-icon">⚠️</div>
-                <div>{error}</div>
-                <div className="ss-empty-sub">Make sure you've done one search in the Workday UI first.</div>
+                <div className="ss-empty-icon">👆</div>
+                <div style={{ fontWeight: 600 }}>One quick step first</div>
+                <div className="ss-empty-sub">Type anything in the Workday search bar above and press Enter — then come back here to search.</div>
               </div>
             )}
-            {!loading && !error && results.length === 0 && (
+            {cacheReady && !loading && results.length === 0 && (
               <div className="ss-empty">
                 <div className="ss-empty-icon">🔍</div>
                 <div>Search for a course above</div>
