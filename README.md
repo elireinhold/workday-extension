@@ -1,4 +1,4 @@
-# Workday Scheduler Extension
+# Workday Course Scheduler Extension
 
 A Chrome extension that enhances the Stevens Institute of Technology Workday portal with a modern scheduling interface.
 
